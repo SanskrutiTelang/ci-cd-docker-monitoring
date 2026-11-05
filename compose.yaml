@@ -1,0 +1,8 @@
+services:
+  task-manager:
+    build: .
+    image: ci-cd-task-manager:local
+    container_name: ci-cd-task-manager
+    ports:
+      - "3000:3000"
+    restart: unless-stopped

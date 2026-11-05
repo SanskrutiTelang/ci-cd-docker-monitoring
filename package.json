@@ -1,0 +1,15 @@
+{
+  "name": "ci-cd-task-manager",
+  "version": "1.0.0",
+  "description": "Beginner-friendly Dockerized Task Manager with CI pipeline and monitoring basics",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "engines": { "node": ">=20" }
+}

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CI/CD Task Manager</title>
+  <style>
+    body{font-family:Arial,sans-serif;max-width:680px;margin:50px auto;padding:0 18px;background:#f5f7fb;color:#202938}
+    main{background:white;padding:26px;border-radius:14px;box-shadow:0 5px 24px #0001}
+    form{display:flex;gap:8px}input{flex:1;padding:11px;border:1px solid #ccd3df;border-radius:7px}button{padding:10px 14px;border:0;border-radius:7px;background:#2459c4;color:white;cursor:pointer}
+    li{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #eee}li span{flex:1}.done{text-decoration:line-through;color:#788}
+    .status{font-size:13px;color:#16834a}
+  </style>
+</head>
+<body><main>
+  <h1>Task Manager</h1><p class="status" id="health">Checking application health…</p>
+  <form id="task-form"><input id="title" placeholder="Enter a task" required><button>Add task</button></form>
+  <ul id="tasks"></ul>
+</main>
+<script>
+const list=document.querySelector('#tasks');
+async function load(){
+  const [health,tasks]=await Promise.all([fetch('/health'),fetch('/api/tasks')]);
+  document.querySelector('#health').textContent=health.ok?'● Application healthy':'● Application unavailable';
+  list.innerHTML='';
+  for(const task of await tasks.json()){
+    const li=document.createElement('li'); const label=document.createElement('span');
+    label.textContent=task.title; if(task.completed) label.className='done';
+    const toggle=document.createElement('button'); toggle.textContent=task.completed?'Undo':'Done';
+    toggle.onclick=async()=>{await fetch(`/api/tasks/${task.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({completed:!task.completed})});load()};
+    const remove=document.createElement('button');remove.textContent='Delete';
+    remove.onclick=async()=>{await fetch(`/api/tasks/${task.id}`,{method:'DELETE'});load()};
+    li.append(label,toggle,remove);list.append(li);
+  }
+}
+document.querySelector('#task-form').addEventListener('submit',async e=>{e.preventDefault();const input=document.querySelector('#title');await fetch('/api/tasks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:input.value})});input.value='';load()});
+load().catch(()=>document.querySelector('#health').textContent='Application unavailable');
+</script></body></html>
