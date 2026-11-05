@@ -1,94 +1,188 @@
-# CI/CD Task Manager with Docker & Monitoring
+# Automated CI/CD Pipeline with Docker & Monitoring
 
-Beginner-friendly project: **GitHub → Build → Test → Docker → Deploy → Monitor**.
+## Project Overview
 
-## Project mein kya hai?
-- Node.js + Express Task Manager web app
-- Automated tests using Node.js built-in test runner
-- GitHub Actions workflow (`.github/workflows/ci.yml`)
-- Dockerfile and Docker Compose
-- `/health` endpoint and Docker health check
-- Basic container logs using `docker compose logs`
+This project demonstrates an automated CI/CD pipeline using GitHub Actions, Docker, Docker Compose, and GitHub Container Registry (GHCR).
 
-## Requirements
-- Node.js 20+ and npm
-- Git
-- Docker Desktop
-- GitHub account
+The application is tested, containerized, built, published, deployed, and monitored through a DevOps workflow.
 
-## 1. Local run (without Docker)
+## Architecture
+
+```text
+Developer
+   |
+   v
+GitHub Repository
+   |
+   v
+GitHub Actions
+   |
+   +---- Install Dependencies
+   |
+   +---- Automated Testing
+   |
+   +---- Docker Image Build
+   |
+   +---- Publish Image to GHCR
+   |
+   v
+Docker Compose Deployment
+   |
+   v
+Running Application
+   |
+   v
+Monitoring & Observability
+   |
+   +---- Application Logs
+   +---- Health Checks
+   +---- CPU & Memory Usage
+```
+
+## Technologies Used
+
+- Git and GitHub
+- GitHub Actions
+- Node.js and Express.js
+- Automated Testing
+- Docker
+- Docker Compose
+- GitHub Container Registry
+- Environment Variables
+- Docker Logs and Health Checks
+
+## Project Features
+
+- Automated testing using GitHub Actions.
+- Automatic Docker image building.
+- Docker image publishing to GHCR.
+- Containerized application deployment.
+- Environment variable management using `.env`.
+- Application health monitoring.
+- Container logs monitoring.
+- CPU and memory usage monitoring.
+
+## Project Structure
+
+```text
+ci-cd-task-manager/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── public/
+│   └── index.html
+├── tests/
+│   └── app.test.js
+├── server.js
+├── package.json
+├── Dockerfile
+├── compose.yaml
+├── .dockerignore
+├── .gitignore
+└── README.md
+```
+
+## How to Run Locally
+
+### 1. Clone the repository
+
+```bash
+git clone YOUR_REPOSITORY_URL
+cd ci-cd-task-manager
+```
+
+### 2. Install dependencies
 
 ```bash
 npm install
+```
+
+### 3. Run automated tests
+
+```bash
 npm test
-npm start
 ```
 
-Browser: http://localhost:3000  
-Health check: http://localhost:3000/health
-
-## 2. Docker run
+### 4. Build Docker image
 
 ```bash
-docker build -t ci-cd-task-manager:v1 .
-docker run --name ci-cd-task-manager -p 3000:3000 -d ci-cd-task-manager:v1
+docker build -t cicd-task-manager:v1 .
 ```
 
-Open http://localhost:3000. Check logs and health:
+### 5. Run Docker container
 
 ```bash
-docker logs ci-cd-task-manager
-docker inspect --format='{{.State.Health.Status}}' ci-cd-task-manager
+docker run -d -p 3000:3000 --name cicd-task-container cicd-task-manager:v1
 ```
 
-Stop and remove the container:
+### 6. Access the application
+
+http://localhost:3000
+
+Health endpoint:
+
+http://localhost:3000/health
+
+## CI/CD Pipeline
+
+GitHub Actions automatically executes the following operations when code is pushed to the main branch:
+
+1. Checks out the source code.
+2. Sets up Node.js.
+3. Installs project dependencies.
+4. Runs automated tests.
+5. Builds the Docker image.
+6. Publishes the Docker image to GitHub Container Registry.
+
+## Deployment
+
+The application is deployed using Docker Compose.
 
 ```bash
-docker stop ci-cd-task-manager
-docker rm ci-cd-task-manager
+docker compose pull
+docker compose up -d
 ```
 
-## 3. Docker Compose deployment
+Check deployment:
 
 ```bash
-docker compose up --build -d
 docker compose ps
+```
+
+## Monitoring
+
+### View application logs
+
+```bash
 docker compose logs -f
 ```
 
-Stop the application:
+### Check container health
 
 ```bash
-docker compose down
+docker ps
 ```
 
-## 4. GitHub Actions CI
+### Monitor resource usage
 
-1. Push this project to a GitHub repository's `main` branch.
-2. Open the repository on GitHub.
-3. Select **Actions**.
-4. Open **CI - Test and Build Docker Image**.
-5. A green check means tests and Docker image build passed.
+```bash
+docker stats ci-cd-task-manager
+```
 
-Workflow runs on every push to `main` and on pull requests targeting `main`.
+## Learning Outcomes
 
-## 5. Monitoring basics
+- Understanding CI/CD pipeline implementation.
+- Automating software testing and Docker builds.
+- Working with GitHub Actions workflows.
+- Publishing Docker images to a container registry.
+- Deploying applications using Docker Compose.
+- Managing environment variables.
+- Understanding application monitoring, logs, and health checks.
 
-- Application health: `http://localhost:3000/health`
-- Container state: `docker compose ps`
-- Application logs: `docker compose logs -f task-manager`
-- Last 100 log lines: `docker compose logs --tail=100 task-manager`
+## Conclusion
 
-## Environment management
+This project demonstrates a practical DevOps workflow that automates testing, Docker image creation, image publishing, deployment preparation, and basic monitoring.
 
-The app reads `PORT` from the environment and defaults to `3000`. Compose sets the port mapping. Never commit passwords, API keys, or `.env` files. Add real secrets in GitHub repository **Settings → Secrets and variables → Actions** when a remote deployment target is configured.
+**Project Type:** DevOps / CI/CD Automation
 
-## Important limitation
-
-This starter automates **continuous integration** (tests + Docker build) on GitHub. Docker Compose provides a repeatable local deployment. To automate deployment to a remote server, choose a target (for example, an existing server or a cloud host) and configure its credentials securely. Do not add credentials to the repository.
-
-## Hinglish explanation
-
-- **CI:** Code push hote hi GitHub Actions code checkout, dependencies install, tests run aur Docker image build karta hai.
-- **CD:** Docker Compose se same configuration ke through app start hoti hai. Remote server par automatic deployment next stage mein configure hoga.
-- **Monitoring:** `/health` endpoint app ki health batata hai; Docker health check status track karta hai; logs se errors dekh sakte hain.
+**Status:** Completed
